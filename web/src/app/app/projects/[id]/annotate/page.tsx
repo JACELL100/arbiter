@@ -879,7 +879,7 @@ function GuidelinesSheet({
   ];
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full gap-0 data-[side=right]:sm:max-w-lg">
+      <SheetContent className="gap-0 data-[side=right]:w-full data-[side=right]:sm:max-w-lg">
         <SheetHeader className="border-b">
           <SheetTitle>Guidelines</SheetTitle>
           <SheetDescription>{task.project.name}</SheetDescription>

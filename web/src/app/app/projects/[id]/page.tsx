@@ -536,7 +536,7 @@ function QualityPanel({
           )}
           {biasWarn && (
             <p className="mt-1.5 flex items-center gap-1.5 text-xs text-amber-700">
-              <AlertTriangle className="size-3.5" /> Annotators lean {pb.left_rate! > 0.5 ? "left" : "right"} more than
+              <AlertTriangle className="size-3.5" /> Annotators lean {(pb.left_rate ?? 0.5) > 0.5 ? "left" : "right"} more than
               expected.
             </p>
           )}
