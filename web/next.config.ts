@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  // The app is client-rendered against an external API; no Cache Components / PPR.
+  cacheComponents: false,
   turbopack: {
     rules: {
       "*.css": {
