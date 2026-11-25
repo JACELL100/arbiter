@@ -875,8 +875,8 @@ function AddItemDialog({ projectId, onCreated }: { projectId: string; onCreated:
 /* LLM jobs                                                                                         */
 /* ------------------------------------------------------------------------------------------------ */
 
-const PREFERRED_A = "llama-3.1-8b-instant";
-const PREFERRED_B = "llama-3.3-70b-versatile";
+const PREFERRED_A = "openai/gpt-oss-20b";
+const PREFERRED_B = "qwen/qwen3.8-27b";
 
 function ToggleRow({
   id,

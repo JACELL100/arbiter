@@ -8,6 +8,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import random
+import re
 import time
 from typing import Any
 
@@ -25,11 +26,16 @@ MAX_RETRIES = 5
 SEMAPHORE = asyncio.Semaphore(4)
 
 FALLBACK_MODELS = [
-    {"id": "llama-3.1-8b-instant", "owned_by": "Meta"},
-    {"id": "llama-3.3-70b-versatile", "owned_by": "Meta"},
     {"id": "openai/gpt-oss-20b", "owned_by": "OpenAI"},
     {"id": "openai/gpt-oss-120b", "owned_by": "OpenAI"},
+    {"id": "qwen/qwen3.8-27b", "owned_by": "Alibaba Cloud"},
+    {"id": "allam-2-7b", "owned_by": "SDAIA"},
 ]
+_THINK_RE = re.compile(r"<think>.*?</think>\s*", re.DOTALL)
+# Reasoning models spend completion tokens on hidden reasoning; give them headroom.
+_REASONING_PREFIXES = ("openai/gpt-oss", "qwen/qwen3", "deepseek")
+REASONING_HEADROOM = 1500
+
 _EXCLUDE = ("whisper", "tts", "guard", "embed", "playai", "orpheus", "prompt-guard", "distil-whisper")
 MODELS_TTL = 600.0
 _models_cache: dict[str, tuple[float, list[dict]]] = {}
@@ -142,6 +148,11 @@ async def chat(
     }
     if json_mode:
         payload["response_format"] = {"type": "json_object"}
+    bare = model_id.split("/", 1)[-1] if provider == "openrouter" else model_id
+    if any(bare.startswith(p) or model_id.startswith(p) for p in _REASONING_PREFIXES):
+        payload["max_tokens"] = max_tokens + REASONING_HEADROOM
+        if provider == "groq" and model_id.startswith("openai/gpt-oss"):
+            payload["reasoning_effort"] = "low"
     async with SEMAPHORE:
         try:
             data = await _request(provider, "POST", "/chat/completions", json=payload)
@@ -155,6 +166,10 @@ async def chat(
         content = data["choices"][0]["message"].get("content") or ""
     except (KeyError, IndexError, TypeError, AttributeError):
         raise GroqError("Malformed response from the model provider")
+    # Strip inline chain-of-thought some models (e.g. Qwen3) emit in the content.
+    content = _THINK_RE.sub("", content)
+    if "<think>" in content:  # unterminated think block: keep only what follows it, if anything
+        content = content.split("</think>")[-1] if "</think>" in content else ""
     return content.strip()
 
 

@@ -55,7 +55,7 @@ create table if not exists public.projects (
   gold_rate            numeric not null default 0.1, -- probability a served task is a gold item
   gold_min_accuracy    numeric not null default 0.6, -- auto-pause below this after gold_min_count golds
   gold_min_count       int  not null default 5,
-  judge_model          text not null default 'llama-3.3-70b-versatile',
+  judge_model          text not null default 'openai/gpt-oss-120b',
   created_by           uuid references public.profiles(id) on delete set null,
   created_at           timestamptz not null default now(),
   updated_at           timestamptz not null default now()

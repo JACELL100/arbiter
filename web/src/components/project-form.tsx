@@ -120,7 +120,7 @@ export function ModelSelect({
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="e.g. llama-3.3-70b-versatile"
+        placeholder="e.g. openai/gpt-oss-120b"
         className={cn("font-mono", className)}
         disabled={disabled}
       />
@@ -180,7 +180,7 @@ const DEFAULT_RUBRIC: RubricCriterion[] = [
   },
 ];
 
-const DEFAULT_JUDGE = "llama-3.3-70b-versatile";
+const DEFAULT_JUDGE = "openai/gpt-oss-120b";
 
 interface Row extends RubricCriterion {
   uid: string;
